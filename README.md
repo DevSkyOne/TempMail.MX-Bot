@@ -1,7 +1,7 @@
 <br />
 <div align="center">
   <a href="https://discord.gg/desky">
-    <img src="https://github.com/DevSkyOne/Drops/raw/main/Assets/tempmail-mx-full.png" height=200 alt="Logo">
+    <img src="https://github.com/DevSkyOne/TempMail.MX-Bot/raw/main/Assets/tempmail-mx-full.png" height=200 alt="Logo">
   </a>
 
   <p align="center">
