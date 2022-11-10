@@ -1,5 +1,65 @@
 {
   "en": {
-
+    "tempmail": {
+      "loading": "Loading...",
+      "embed": {
+        "description": "Your temporary email address is: \n`%{prefix}@%{domain}`\n \nYou can use it to sign up for websites and services that require an email address to verify your account. \n \nTo get a new email address, type </tempmail:1040258345812119624>.",
+        "description-locked": "\n \nYour temporary email address `%{prefix}@%{domain}` is locked. If you have the password, press the button below to unlock it. \n \nIf you don't have the password, type </tempmail:1040258345812119624> to get a new email address.",
+        "footer" : "Refreshed %{time}"
+      },
+      "button": {
+        "refresh": "Refresh",
+        "set-pass": "Set password",
+        "unlock-pass": "Unlock with password",
+        "send": "Send email",
+        "web": "Open in browser"
+      },
+      "mails": {
+        "from": "From %{sender}",
+        "select": "Select a mail to read it",
+        "not-found": "No mail found",
+        "embed": {
+          "title": "%{subject} from %{sender}",
+          "description": "%{text}"
+        }
+      },
+      "unlock_pass": {
+        "modal": {
+          "title": "Unlock your temporary email address",
+          "input": "Password",
+          "placeholder": "Enter your password"
+        },
+        "success": "Your temporary email address is now unlocked. You can use it to sign up for websites and services that require an email address to verify your account.",
+        "failed": "The password you entered is incorrect. Please try again."
+      },
+      "set_pass": {
+        "modal": {
+          "title": "Claim your temporary email address",
+          "input": "Password",
+          "placeholder": "Enter a new password"
+        },
+        "success": "Your temporary email address is now locked. You can use it to sign up for websites and services that require an email address to verify your account.",
+        "failed": "Something went wrong. Please try again."
+      },
+      "send_email": {
+        "modal": {
+          "title": "Send an email"
+        },
+        "to": {
+          "label": "To",
+          "placeholder": "Enter the recipient's email address"
+        },
+        "subject": {
+          "label": "Subject",
+          "placeholder": "Enter the subject of the email"
+        },
+        "text": {
+          "label": "Email text",
+          "placeholder": "Enter the text of the email"
+        },
+        "success": "Your email has been sent.",
+        "failed": "Something went wrong. Please try again."
+      }
+    }
   }
 }
