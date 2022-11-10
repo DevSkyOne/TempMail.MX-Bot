@@ -27,12 +27,12 @@ class TempMailAPI:
 			"avail": True
 		})
 
-	async def set_password(self, mail: str, password: str, new_password: str = None):
-		if new_password is None:
+	async def set_password(self, mail: str, new_password: str, password: str = None):
+		if password is None:
 			return await self.post({
 				"act": "setpw",
 				"mail": mail,
-				"pw": str(base64.b64encode(password.encode('utf-8')).decode('utf-8'))
+				"pw": str(base64.b64encode(new_password.encode('utf-8')).decode('utf-8'))
 			})
 		return await self.post({
 			"act": "setpw",
