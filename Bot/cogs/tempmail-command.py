@@ -66,7 +66,7 @@ class TempMailCommand(commands.Cog):
 
 	async def refresh_mail(self, message: discord.Message, prefix: str,
 	                       domain: str, locale: str = 'en', password: str = None):
-		if password is 'None':
+		if password == 'None':
 			password = None
 		mails = await tempmailAPI.get_email(mail=f'{prefix}@{domain}', password=password)
 		password_required = False
@@ -111,7 +111,8 @@ class TempMailCommand(commands.Cog):
 			Button(label=i18n.t('tempmail.button.refresh', locale=locale), style=ButtonStyle.green,
 			       custom_id=f'mx-refresh:{domain}@{prefix}:{password}'),
 			pass_button,
-			Button(label=i18n.t('tempmail.button.send', locale=locale), style=ButtonStyle.gray, custom_id=f'mx-send:{domain}@{prefix}:{password}'),
+			Button(label=i18n.t('tempmail.button.send', locale=locale), style=ButtonStyle.gray,
+			       custom_id=f'mx-send:{domain}@{prefix}:{password}', disabled=(password is None)),
 			Button(label=i18n.t('tempmail.button.web', locale=locale), style=ButtonStyle.gray,
 			       url=f'https://tempmail.mx/?mail={prefix}@{domain}')
 		], mail_row])
@@ -145,7 +146,7 @@ class TempMailCommand(commands.Cog):
 		locale = map_locale(ctx.author_locale)
 		domain, prefix = ctx.data.custom_id.split(':')[1].split('@')
 		password = ctx.data.custom_id.split(':')[2]
-		if password is 'None':
+		if password == 'None':
 			password = None
 		message = await ctx.respond(i18n.t('tempmail.loading', locale=locale), hidden=True)
 		mails = await tempmailAPI.get_email(mail=f'{prefix}@{domain}', password=password)
@@ -222,7 +223,7 @@ class TempMailCommand(commands.Cog):
 		await ctx.defer(hidden=True)
 		domain, prefix = ctx.data.custom_id.split(':')[1].split('@')
 		old_password = ctx.data.custom_id.split(':')[2]
-		if old_password is 'None':
+		if old_password == 'None':
 			old_password = None
 		locale = map_locale(ctx.author_locale)
 		password = ctx.get_field('mx-set-pass-input').value
