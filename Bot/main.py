@@ -17,7 +17,7 @@ log = logging.getLogger('BOT-MAIN')
 intents: discord.Intents = discord.Intents.default()
 
 bot = commands.Bot(
-    command_prefix=commands.when_mentioned_or('dr!'),
+    command_prefix=commands.when_mentioned_or('mx!'),
     strip_after_prefix=True,
     sync_commands=True,
     delete_not_existing_commands=True,
