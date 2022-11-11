@@ -1,0 +1,65 @@
+{
+  "de": {
+    "tempmail": {
+      "loading": "Loading...",
+      "embed": {
+        "description": "Ihre temporäre E-Mail-Adresse lautet: \n`%{prefix}@%{domain}`\n \nDamit können Sie sich bei Websites und Diensten anmelden, die eine E-Mail-Adresse zur Verifizierung Ihres Kontos benötigen. \n \nUm eine neue E-Mail-Adresse zu erhalten, geben Sie </tempmail:1040258345812119624> ein.",
+        "description-locked": "\n \nIhre temporäre E-Mail-Adresse `%{prefix}@%{domain}` ist gesperrt. Wenn Sie das Passwort haben, drücken Sie auf die Schaltfläche unten, um sie zu entsperren. \n \nWenn Sie das Kennwort nicht haben, geben Sie </tempmail:1040258345812119624> ein, um eine neue E-Mail-Adresse zu erhalten.",
+        "footer": "Refreshed %{time}"
+      },
+      "button": {
+        "refresh": "Aktualisieren",
+        "set-pass": "Passwort setzen",
+        "unlock-pass": "Mit Passwort entsperren",
+        "send": "E-Mail senden",
+        "web": "Im Browser öffnen"
+      },
+      "mails": {
+        "from": "Von %{Absender}",
+        "select": "Wählen Sie eine Mail aus, um sie zu lesen",
+        "not-found": "Keine Mail gefunden",
+        "embed": {
+          "title": "%{subject} von %{sender}",
+          "description": "%{text}"
+        }
+      },
+      "unlock_pass": {
+        "modal": {
+          "title": "Entsperren Sie Ihre temporäre E-Mail-Adresse",
+          "input": "Passwort",
+          "placeholder": "Geben Sie Ihr Passwort ein"
+        },
+        "success": "Ihre temporäre E-Mail-Adresse ist jetzt freigeschaltet. Sie können sie verwenden, um sich bei Websites und Diensten anzumelden, die eine E-Mail-Adresse zur Verifizierung Ihres Kontos benötigen.",
+        "failed": "Das von Ihnen eingegebene Passwort ist falsch. Bitte versuchen Sie es erneut."
+      },
+      "set_pass": {
+        "modal": {
+          "title": "Fordern Sie Ihre temporäre E-Mail-Adresse an",
+          "input": "Passwort",
+          "placeholder": "Geben Sie ein neues Passwort ein"
+        },
+        "success": "Ihre temporäre E-Mail-Adresse ist jetzt gesperrt. Sie können sie verwenden, um sich bei Websites und Diensten anzumelden, die eine E-Mail-Adresse zur Verifizierung Ihres Kontos erfordern.",
+        "failed": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut."
+      },
+      "send_email": {
+        "modal": {
+          "title": "Eine E-Mail senden"
+        },
+        "to": {
+          "label": "An",
+          "placeholder": "Geben Sie die E-Mail-Adresse des Empfängers ein"
+        },
+        "subject": {
+          "label": "Betreff",
+          "placeholder": "Geben Sie den Betreff der E-Mail ein"
+        },
+        "text": {
+          "label": "E-Mail-Text",
+          "placeholder": "Geben Sie den Text der E-Mail ein"
+        },
+        "success": "Ihre E-Mail wurde versendet.",
+        "failed": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut."
+      }
+    }
+  }
+}
