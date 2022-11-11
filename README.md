@@ -4,7 +4,7 @@
     <img src="https://badges.flawcra.cc/official_for-the-badge" />
   </a>
   <a href="https://discord.gg/devsky">
-    <img src="https://github.com/DevSkyOne/TempMail.MX-Bot/raw/main/Assets/tempmail-mx-full.png" height=200 alt="Logo">
+    <img src="Assets/TempMail_Banner.jpg" height="auto" width="100%" alt="Logo">
   </a>
 
   <p align="center">
@@ -18,6 +18,8 @@
     <a href="https://tempmail.mx">Website</a>
     ·
     <a href="https://discord4py.dev/tree/developer" alt="discord4py is the Discord API-Wrapper the Drops-Bot uses">discord4py (library)</a>
+    ·
+    <a href="https://github.com/TheFruxz" alt="Banner made by TheFruxz">Banner made by TheFruxz</a>
   </p>
 </div>
 
