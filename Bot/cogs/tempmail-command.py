@@ -138,7 +138,8 @@ class TempMailCommand(commands.Cog):
 			domains_raw = (await tempmailAPI.get_domains()).get('response')
 			domains = [SlashCommandOptionChoice(name=domain_val, value=domain_val) for domain_val in domains_raw if
 			           domain_val.startswith(domain) or domain is None]
-			await ctx.send_choices(domains)
+			#  Get the first 25 domains
+			await ctx.send_choices(domains[:25])
 
 	@commands.Cog.on_select('^mx-mails:[a-z0-9._-]+@[0-9,a-z,.]+:[\S]+$')
 	async def mail_click(self, ctx: ComponentInteraction, _):
