@@ -138,6 +138,8 @@ class TempMailCommand(commands.Cog):
 			domains_raw = (await tempmailAPI.get_domains()).get('response')
 			domains = [SlashCommandOptionChoice(name=domain_val, value=domain_val) for domain_val in domains_raw if
 			           domain_val.startswith(domain) or domain is None]
+			#  Sort domains by length ascending and then alphabetically
+			domains.sort(key=lambda x: (len(x.name), x.name))
 			#  Get the first 25 domains
 			await ctx.send_choices(domains[:25])
 
