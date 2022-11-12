@@ -60,6 +60,17 @@
         "success": "Your email has been sent.",
         "failed": "Something went wrong. Please try again."
       }
+    },
+    "tempmails": {
+      "no_mails": "No mails found",
+      "loading": "Loading...",
+      "title": "Your temporary email addresses",
+      "description": "These are your previously saved temporary email addresses:\n \n%{mails}\n \nTo get a new email address, type </tempmail:1040258345812119624>.",
+      "footer": "You have %{count} temporary email addresses.",
+      "previous_page": "« Page %{page}",
+      "next_page": "Page %{page} »",
+      "first_page": "« First page",
+       "last_page": "Last page »"
     }
   }
 }
