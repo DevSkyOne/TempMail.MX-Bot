@@ -60,6 +60,17 @@
         "success": "Ihre E-Mail wurde versendet.",
         "failed": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut."
       }
+    },
+    "tempmails": {
+      "no_mails": "Keine Mails gefunden",
+      "loading": "Loading...",
+      "title": "Ihre temporären E-Mail-Adressen",
+      "description": "Dies sind Ihre zuvor gespeicherten temporären E-Mail-Adressen:\n \n%{mails}\n \nUm eine neue E-Mail-Adresse zu erhalten, geben Sie </tempmail:1040258345812119624> ein.",
+      "footer": "Sie haben %{count} temporäre E-Mail-Adressen.",
+      "previous_page": "« Seite %{page}",
+      "next_page": "Seite %{Seite} »",
+      "first_page": "« Erste Seite",
+       "last_page": "Letzte Seite "
     }
   }
 }

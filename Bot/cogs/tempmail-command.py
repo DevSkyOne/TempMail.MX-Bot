@@ -9,6 +9,7 @@ from discord import Localizations, SlashCommandOption, ApplicationCommandInterac
 from discord.ext import commands
 from Bot.TempMailAPI import TempMailAPI
 from Bot.utils.LanguageTransformer import map_locale, repair_email_prefix
+from Database.database_access import insert_or_update_mail
 
 tempmailAPI = TempMailAPI()
 
@@ -220,6 +221,7 @@ class TempMailCommand(commands.Cog):
 		if await self.test_if_locked(mail=f'{prefix}@{domain}', password=password):
 			return await ctx.edit(content=i18n.t('tempmail.unlock_pass.failed', locale=locale))
 		await ctx.respond(i18n.t('tempmail.unlock_pass.success', locale=locale), hidden=True)
+		await insert_or_update_mail(clientid=ctx.author.id, mail=f'{prefix}@{domain}')
 
 	@commands.Cog.on_submit('^mx-set-pass-modal:[a-z0-9._-]+@[0-9,a-z,.]+:[\S]+$')
 	async def set_pass_submit(self, ctx: ModalSubmitInteraction):
@@ -235,6 +237,7 @@ class TempMailCommand(commands.Cog):
 		if await self.test_if_locked(mail=f'{prefix}@{domain}', password=password):
 			return await ctx.edit(content=i18n.t('tempmail.set_pass.failed', locale=locale))
 		await ctx.respond(i18n.t('tempmail.set_pass.success', locale=locale), hidden=True)
+		await insert_or_update_mail(clientid=ctx.author.id, mail=f'{prefix}@{domain}')
 
 	async def test_if_locked(self, mail: str, password: str = None) -> bool:
 		if password == 'None':
