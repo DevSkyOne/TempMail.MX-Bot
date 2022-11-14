@@ -1,15 +1,11 @@
-import datetime
-import uuid
-
 import discord
 import i18n
-from discord import Localizations, SlashCommandOption, ApplicationCommandInteraction, AutocompleteInteraction, \
-	SlashCommandOptionChoice, Button, ButtonStyle, SelectMenu, SelectOption, ComponentInteraction, Modal, TextInput, \
-	ModalSubmitInteraction, TextInputStyle
+from discord import Localizations, ApplicationCommandInteraction, Button, ButtonStyle, ComponentInteraction
 from discord.ext import commands
+
 from Bot.TempMailAPI import TempMailAPI
-from Bot.utils.LanguageTransformer import map_locale, repair_email_prefix
-from Database.database_access import insert_or_update_mail, get_mails
+from Bot.utils.LanguageTransformer import map_locale
+from Database.database_access import get_mails
 
 tempmailAPI = TempMailAPI()
 
@@ -21,12 +17,6 @@ def apply_prefix(mail) -> str:
 class TempMailsCommand(commands.Cog):
 	def __init__(self, bot):
 		self.bot: commands.Bot = bot
-
-	@commands.Cog.listener()
-	async def on_ready(self):
-		print(f'Bot is on {len(self.bot.guilds)} guilds')
-		for guild in self.bot.guilds:
-			print(f'Guild: {guild.name} ({guild.id})')
 
 	@commands.Cog.slash_command(
 		name='tempmails',
