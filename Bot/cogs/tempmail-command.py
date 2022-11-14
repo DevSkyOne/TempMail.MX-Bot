@@ -58,23 +58,28 @@ class TempMailCommand(commands.Cog):
 			domain = 'tempmail.mx'
 		else:
 			#  Test if domain is valid
-			domains = (await tempmailAPI.get_domains()).get('response')
+			domains = await tempmailAPI.get_domains()
 			if domain not in domains:
 				domain = 'tempmail.mx'
 
 		message = await ctx.respond(i18n.t('tempmail.loading', locale=locale), hidden=True)
-		await self.refresh_mail(message, prefix, domain, locale)
+
+		unlock_response = await tempmailAPI.unlock_mail(mail=f'{prefix}@{domain}')
+		hash = None
+		if unlock_response.get('success'):
+			hash = unlock_response.get('response').get('hash')
+
+		await self.refresh_mail(message, prefix, domain, locale, hash)
 
 	async def refresh_mail(self, message: discord.Message, prefix: str,
-	                       domain: str, locale: str = 'en', password: str = None):
-		if password == 'None':
-			password = None
-		mails = await tempmailAPI.get_email(mail=f'{prefix}@{domain}', password=password)
+	                       domain: str, locale: str = 'en', hash: str = None):
+		if hash == 'None':
+			hash = None
+		mails = await tempmailAPI.get_email(mail=f'{prefix}@{domain}', hash=hash)
 		password_required = False
 
-		if mails.get('response').__contains__('msg'):
-			msg = mails.get('response').get('msg')
-			password_required = (msg == 'Password required') or (msg == 'Wrong password')
+		if not mails.get('success'):
+			password_required = True
 
 		mail_options = []
 		mail_row = []
@@ -85,7 +90,7 @@ class TempMailCommand(commands.Cog):
 		if not password_required:
 			description = i18n.t('tempmail.embed.description', locale=locale, prefix=prefix, domain=domain)
 			pass_button = Button(label=i18n.t('tempmail.button.set-pass', locale=locale), style=ButtonStyle.gray,
-			                     custom_id=f'mx-set-pass:{domain}@{prefix}:{password}')
+			                     custom_id=f'mx-set-pass:{domain}@{prefix}:{hash}')
 			for mail in mails.get('response'):
 				mail_options.append(SelectOption(label=f'{mail.get("message").get("subject")}',
 				                                 description=i18n.t('tempmail.mails.from', locale=locale,
@@ -95,7 +100,7 @@ class TempMailCommand(commands.Cog):
 			if len(mail_options) > 0:
 				mail_row = [
 					SelectMenu(
-						custom_id=f'mx-mails:{domain}@{prefix}:{password}',
+						custom_id=f'mx-mails:{domain}@{prefix}:{hash}',
 						placeholder=i18n.t('tempmail.mails.select', locale=locale),
 						options=mail_options
 					)
@@ -110,12 +115,12 @@ class TempMailCommand(commands.Cog):
 			text=f'© 2022 TempMail.MX Bot ⬤ {i18n.t("tempmail.embed.footer", locale=locale, time=datetime.datetime.now().strftime("%H:%M:%S"))}')
 		await message.edit(content='', embed=embed, components=[[
 			Button(label=i18n.t('tempmail.button.refresh', locale=locale), style=ButtonStyle.green,
-			       custom_id=f'mx-refresh:{domain}@{prefix}:{password}'),
+			       custom_id=f'mx-refresh:{domain}@{prefix}:{hash}'),
 			pass_button,
 			Button(label=i18n.t('tempmail.button.send', locale=locale), style=ButtonStyle.gray,
-			       custom_id=f'mx-send:{domain}@{prefix}:{password}', disabled=(password is None)),
+			       custom_id=f'mx-send:{domain}@{prefix}:{hash}', disabled=(hash is None)),
 			Button(label=i18n.t('tempmail.button.web', locale=locale), style=ButtonStyle.gray,
-			       url=f'https://tempmail.mx/?mail={prefix}@{domain}')
+			       url=f'https://tempmail.mx')
 		], mail_row])
 
 	@commands.Cog.on_click('^mx-refresh:[a-z0-9._-]+@[0-9,a-z,.]+:[\S]+$')
@@ -123,8 +128,8 @@ class TempMailCommand(commands.Cog):
 		await ctx.defer(hidden=True)
 		locale = map_locale(ctx.author_locale)
 		domain, prefix = ctx.data.custom_id.split(':')[1].split('@')
-		password = ctx.data.custom_id.split(':')[2]
-		await self.refresh_mail(ctx.message, prefix, domain, locale, password)
+		hash = ctx.data.custom_id.split(':')[2]
+		await self.refresh_mail(ctx.message, prefix, domain, locale, hash)
 
 	@tempmail.autocomplete_callback
 	async def tempmail_autocomplete(self, ctx: AutocompleteInteraction, prefix: str = None, domain: str = None) -> None:
@@ -136,7 +141,7 @@ class TempMailCommand(commands.Cog):
 			            prefix_val.startswith(prefix)]
 			await ctx.send_choices(prefixes)
 		elif ctx.focused_option_name == 'domain':
-			domains_raw = (await tempmailAPI.get_domains()).get('response')
+			domains_raw = await tempmailAPI.get_domains()
 			domains = [SlashCommandOptionChoice(name=domain_val, value=domain_val) for domain_val in domains_raw if
 			           domain_val.startswith(domain) or domain is None]
 			#  Sort domains by length ascending and then alphabetically
@@ -149,11 +154,11 @@ class TempMailCommand(commands.Cog):
 		mail_id = ctx.data.values[0]
 		locale = map_locale(ctx.author_locale)
 		domain, prefix = ctx.data.custom_id.split(':')[1].split('@')
-		password = ctx.data.custom_id.split(':')[2]
-		if password == 'None':
-			password = None
+		hash = ctx.data.custom_id.split(':')[2]
+		if hash == 'None':
+			hash = None
 		message = await ctx.respond(i18n.t('tempmail.loading', locale=locale), hidden=True)
-		mails = await tempmailAPI.get_email(mail=f'{prefix}@{domain}', password=password)
+		mails = await tempmailAPI.get_email(mail=f'{prefix}@{domain}', hash=hash)
 		mail = None
 		for mail_raw in mails.get('response'):
 			if mail_raw.get('id') == mail_id:
@@ -194,10 +199,10 @@ class TempMailCommand(commands.Cog):
 	@commands.Cog.on_click('^mx-set-pass:[a-z0-9._-]+@[0-9,a-z,.]+:[\S]+$')
 	async def set_pass_click(self, ctx: ComponentInteraction, _):
 		domain, prefix = ctx.data.custom_id.split(':')[1].split('@')
-		password = ctx.data.custom_id.split(':')[2]
+		hash = ctx.data.custom_id.split(':')[2]
 		locale = map_locale(ctx.author_locale)
 		await ctx.respond_with_modal(modal=Modal(
-			custom_id=f'mx-set-pass-modal:{domain}@{prefix}:{password}',
+			custom_id=f'mx-set-pass-modal:{domain}@{prefix}:{hash}',
 			title=i18n.t('tempmail.set_pass.modal.title', locale=locale),
 			components=[[
 				TextInput(
@@ -217,8 +222,14 @@ class TempMailCommand(commands.Cog):
 		domain, prefix = ctx.data.custom_id.split(':')[1].split('@')
 		locale = map_locale(ctx.author_locale)
 		password = ctx.get_field('mx-unlock-pass-input').value
-		await self.refresh_mail(ctx.message, prefix, domain, locale, password)
-		if await self.test_if_locked(mail=f'{prefix}@{domain}', password=password):
+
+		unlock_response = await tempmailAPI.unlock_mail(mail=f'{prefix}@{domain}', password=password)
+		if not unlock_response.get('success'):
+			return await ctx.edit(content=i18n.t('tempmail.unlock_pass.failed', locale=locale))
+
+		hash = unlock_response.get('response').get('hash')
+		await self.refresh_mail(ctx.message, prefix, domain, locale, hash)
+		if await self.test_if_locked(mail=f'{prefix}@{domain}', hash=hash):
 			return await ctx.edit(content=i18n.t('tempmail.unlock_pass.failed', locale=locale))
 		await ctx.respond(i18n.t('tempmail.unlock_pass.success', locale=locale), hidden=True)
 		await insert_or_update_mail(clientid=ctx.author.id, mail=f'{prefix}@{domain}')
@@ -227,25 +238,27 @@ class TempMailCommand(commands.Cog):
 	async def set_pass_submit(self, ctx: ModalSubmitInteraction):
 		await ctx.defer(hidden=True)
 		domain, prefix = ctx.data.custom_id.split(':')[1].split('@')
-		old_password = ctx.data.custom_id.split(':')[2]
-		if old_password == 'None':
-			old_password = None
+		hash = ctx.data.custom_id.split(':')[2]
+		if hash == 'None':
+			hash = None
 		locale = map_locale(ctx.author_locale)
 		password = ctx.get_field('mx-set-pass-input').value
-		await tempmailAPI.set_password(mail=f'{prefix}@{domain}', password=old_password, new_password=password)
-		await self.refresh_mail(ctx.message, prefix, domain, locale, password)
-		if await self.test_if_locked(mail=f'{prefix}@{domain}', password=password):
+
+		setpass_response = await tempmailAPI.set_password(mail=f'{prefix}@{domain}', hash=hash, new_password=password)
+		if not setpass_response.get('success'):
 			return await ctx.edit(content=i18n.t('tempmail.set_pass.failed', locale=locale))
+
+		await self.refresh_mail(ctx.message, prefix, domain, locale, hash)
 		await ctx.respond(i18n.t('tempmail.set_pass.success', locale=locale), hidden=True)
 		await insert_or_update_mail(clientid=ctx.author.id, mail=f'{prefix}@{domain}')
 
-	async def test_if_locked(self, mail: str, password: str = None) -> bool:
-		if password == 'None':
-			password = None
-		mails = await tempmailAPI.get_email(mail=f'{mail}', password=password)
+	async def test_if_locked(self, mail: str, hash: str = None) -> bool:
+		if hash == 'None':
+			hash = None
+		mails = await tempmailAPI.get_email(mail=f'{mail}', hash=hash)
 		password_required = False
 
-		if mails.get('response').__contains__('msg'):
+		if not mails.get('success'):
 			msg = mails.get('response').get('msg')
 			password_required = (msg == 'Password required') or (msg == 'Wrong password')
 		return password_required
@@ -253,9 +266,9 @@ class TempMailCommand(commands.Cog):
 	@commands.Cog.on_click('^mx-send:[a-z0-9._-]+@[0-9,a-z,.]+:[\S]+$')
 	async def send_email_click(self, ctx: ComponentInteraction, _):
 		domain, prefix = ctx.data.custom_id.split(':')[1].split('@')
-		password = ctx.data.custom_id.split(':')[2]
+		hash = ctx.data.custom_id.split(':')[2]
 		await ctx.respond_with_modal(modal=Modal(
-			custom_id=f'mx-send-email-modal:{domain}@{prefix}:{password}',
+			custom_id=f'mx-sem:{domain}@{prefix}:{hash}',
 			title=i18n.t('tempmail.send_email.modal.title', locale=map_locale(ctx.author_locale)),
 			components=[[
 				TextInput(
@@ -285,16 +298,16 @@ class TempMailCommand(commands.Cog):
 			]]
 		))
 
-	@commands.Cog.on_submit('^mx-send-email-modal:[a-z0-9._-]+@[0-9,a-z,.]+:[\S]+$')
+	@commands.Cog.on_submit('^mx-sem:[a-z0-9._-]+@[0-9,a-z,.]+:[\S]+$')
 	async def send_email_submit(self, ctx: ModalSubmitInteraction):
 		await ctx.defer(hidden=True)
 		domain, prefix = ctx.data.custom_id.split(':')[1].split('@')
-		password = ctx.data.custom_id.split(':')[2]
+		hash = ctx.data.custom_id.split(':')[2]
 		locale = map_locale(ctx.author_locale)
 		to = ctx.get_field('mx-send-email-to').value
 		subject = ctx.get_field('mx-send-email-subject').value
 		text = ctx.get_field('mx-send-email-text').value
-		await tempmailAPI.send_email(mail=f'{prefix}@{domain}', password=password, to=to, subject=subject, text=text)
+		await tempmailAPI.send_email(mail=f'{prefix}@{domain}', hash=hash, to=to, subject=subject, text=text)
 		await ctx.respond(i18n.t('tempmail.send_email.success', locale=locale), hidden=True)
 
 

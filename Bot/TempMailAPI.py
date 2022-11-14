@@ -2,7 +2,7 @@ import base64
 
 import aiohttp
 
-TEMPMAIL_API_URL = 'https://tempmail.mx/?api'
+TEMPMAIL_API_URL = 'https://api.tempmail.mx/'
 
 
 class TempMailAPI:
@@ -22,44 +22,56 @@ class TempMailAPI:
 					return await response.json()
 
 	async def get_domains(self):
-		return await self.post({
-			"act": "domains",
+		raw = await self.post({
+			"act": "list_domains",
 			"avail": True
 		})
+		if not raw.get('success'):
+			return []
+		domains = []
+		for domain in raw.get('response'):
+			domains.append(domain.get('domain'))
+		return domains
 
-	async def set_password(self, mail: str, new_password: str, password: str = None):
+	async def unlock_mail(self, mail: str, password: str = None):
 		if password is None:
 			return await self.post({
-				"act": "setpw",
+				"act": "unlock_mail",
+				"mail": mail
+			})
+		return await self.post({
+			"act": "unlock_mail",
+			"mail": mail,
+			"pw": str(base64.b64encode(password.encode('utf-8')).decode('utf-8'))
+		})
+
+	async def set_password(self, mail: str, new_password: str, hash: str = None):
+		if hash is None:
+			return await self.post({
+				"act": "claim_mail",
 				"mail": mail,
 				"pw": str(base64.b64encode(new_password.encode('utf-8')).decode('utf-8'))
 			})
 		return await self.post({
-			"act": "setpw",
+			"act": "claim_mail",
 			"mail": mail,
-			"oldpw": str(base64.b64encode(password.encode('utf-8')).decode('utf-8')),
+			"hash": hash,
 			"pw": str(base64.b64encode(new_password.encode('utf-8')).decode('utf-8'))
 		})
 
-	async def get_email(self, mail: str, password: str = None):
-		if password is None:
-			return await self.post({
-				"act": "mails",
-				"mail": mail
-			})
-
+	async def get_email(self, mail: str, hash: str):
 		return await self.post({
-			"act": "mails",
+			"act": "get_mails",
 			"mail": mail,
-			"pw": str(base64.b64encode(password.encode('utf-8')).decode('utf-8'))
+			"hash": hash
 		})
 
-	async def send_email(self, mail: str, password: str, to: str, subject: str, text: str):
+	async def send_email(self, mail: str, hash: str, to: str, subject: str, text: str):
 		return await self.post({
-			"act": "send",
+			"act": "send_mail",
 			"mail": mail,
 			"to": to,
 			"subject": subject,
 			"body": text,
-			"pw": str(base64.b64encode(password.encode('utf-8')).decode('utf-8'))
+			"hash": hash
 		})

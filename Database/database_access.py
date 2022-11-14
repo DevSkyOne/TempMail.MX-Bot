@@ -30,5 +30,5 @@ async def get_mails(clientid: str) -> list:
 	pool.close()
 	await pool.wait_closed()
 	#  check if mails are valid
-	valid_domains = (await tempmailAPI.get_domains()).get('response')
+	valid_domains = await tempmailAPI.get_domains()
 	return [mail[0] for mail in mails if mail[0].split('@')[1] in valid_domains]
